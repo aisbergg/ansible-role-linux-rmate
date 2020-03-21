@@ -1,0 +1,53 @@
+---
+- name: Get installed version
+  shell: "rmate --version || echo -n '0'"
+  failed_when: false
+  changed_when: false
+  register: installed_version
+
+- name: Check what the latest version is
+  shell: |
+    set -o pipefail
+    git ls-remote --tags --refs --sort='v:refname' {{ rmate_repository }} | tail -n1 | sed 's/.*\/v//'
+  register: latest_version
+  failed_when: latest_version.rc != 0
+  changed_when: false
+  when: rmate_version == 'latest'
+
+- name: Define version to install
+  set_fact:
+    version_to_install: "{{ latest_version.stdout_lines[0] if rmate_version == 'latest' else rmate_version }}"
+
+- block:
+    - name: Ensure source directory exists
+      file:
+        state: directory
+        path: /usr/local/bin
+
+    - name: Clone source code
+      git:
+        repo: "{{ rmate_repository }}"
+        version: "v{{ version_to_install }}"
+        clone: true
+        depth: 1
+        force: true
+        dest: /usr/local/src/rmate
+
+    - name: "Install rmate script version {{ version_to_install }}"
+      copy:
+        src: /usr/local/src/rmate/rmate
+        dest: /usr/local/bin/rmate
+        remote_src: yes
+        owner: root
+        group: root
+        mode: "0755"
+
+  when: version_to_install != installed_version.stdout_lines[0]
+
+- name: Create aliases for rmate
+  file:
+    src: /usr/local/bin/rmate
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    force: true
+  loop: "{{ rmate_aliases }}"

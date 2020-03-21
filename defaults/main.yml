@@ -1,0 +1,10 @@
+---
+# repository to install from
+rmate_repository: "https://github.com/aurora/rmate.git"
+
+# version to install; can be either a specific value (e.g. '1.0.2') or 'latest'
+rmate_version: latest
+
+# aliases for the executable
+rmate_aliases:
+  - rcode
