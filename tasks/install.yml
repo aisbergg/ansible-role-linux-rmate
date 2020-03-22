@@ -8,7 +8,9 @@
 - name: Check what the latest version is
   shell: |
     set -o pipefail
-    git ls-remote --tags --refs --sort='v:refname' {{ rmate_repository }} | tail -n1 | sed 's/.*\/v//'
+    git ls-remote --tags --refs {{ rmate_repository }} | sed 's/.*\/v//' | sort -V | tail -n1
+  args:
+    executable: /bin/bash
   register: latest_version
   failed_when: latest_version.rc != 0
   changed_when: false
