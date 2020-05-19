@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2020-05-19
+### Changed
+- Clean up
+
 ## [1.0.0] - 2020-03-22
 ### Changed
 - Correct required Ansible version

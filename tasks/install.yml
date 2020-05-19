@@ -3,6 +3,7 @@
   shell: "rmate --version || echo -n '0'"
   failed_when: false
   changed_when: false
+  check_mode: false
   register: installed_version
 
 - name: Check what the latest version is
@@ -14,13 +15,15 @@
   register: latest_version
   failed_when: latest_version.rc != 0
   changed_when: false
+  check_mode: false
   when: rmate_version == 'latest'
 
 - name: Define version to install
   set_fact:
     version_to_install: "{{ latest_version.stdout_lines[0] if rmate_version == 'latest' else rmate_version }}"
 
-- block:
+- when: version_to_install != installed_version.stdout_lines[0]
+  block:
     - name: Ensure source directory exists
       file:
         state: directory
@@ -35,7 +38,7 @@
         force: true
         dest: /usr/local/src/rmate
 
-    - name: "Install rmate script version {{ version_to_install }}"
+    - name: Install rmate script version {{ version_to_install }}
       copy:
         src: /usr/local/src/rmate/rmate
         dest: /usr/local/bin/rmate
@@ -43,8 +46,6 @@
         owner: root
         group: root
         mode: "0755"
-
-  when: version_to_install != installed_version.stdout_lines[0]
 
 - name: Create aliases for rmate
   file:
