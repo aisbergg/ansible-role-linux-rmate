@@ -2,12 +2,14 @@
 dependencies: []
 
 galaxy_info:
-  author: Aisbergg
+  author: André Lehmann
+  namespace: aisbergg
+  role_name: rmate
   description: Install the rmate script for remote text editing.
   company: none
-  issue_tracker_url: https://github.com/Aisbergg/ansible-role-linux-rmate/issues
+  issue_tracker_url: https://github.com/aisbergg/ansible-role-linux-rmate/issues
   license: MIT
-  min_ansible_version: 2.5
+  min_ansible_version: 2.10
 
   platforms:
     - name: EL
@@ -23,7 +25,7 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - all
-    - name: Archlinux
+    - name: ArchLinux
       versions:
         - all
 

@@ -1,13 +1,13 @@
 ---
-- name: Get installed version
-  shell: "rmate --version || echo -n '0'"
+- name: get installed version
+  ansible.builtin.shell: "rmate --version || echo -n '0'"
   failed_when: false
   changed_when: false
   check_mode: false
   register: installed_version
 
-- name: Check what the latest version is
-  shell: |
+- name: check what the latest version is
+  ansible.builtin.shell: |
     set -o pipefail
     git ls-remote --tags --refs {{ rmate_repository }} | sed 's/.*\/v//' | sort -V | tail -n1
   args:
@@ -18,19 +18,20 @@
   check_mode: false
   when: rmate_version == 'latest'
 
-- name: Define version to install
-  set_fact:
+- name: define version to install
+  ansible.builtin.set_fact:
     version_to_install: "{{ latest_version.stdout_lines[0] if rmate_version == 'latest' else rmate_version }}"
 
 - when: version_to_install != installed_version.stdout_lines[0]
   block:
-    - name: Ensure source directory exists
-      file:
+    - name: ensure source directory exists
+      ansible.builtin.file:
         state: directory
         path: /usr/local/bin
+        mode: 0755
 
-    - name: Clone source code
-      git:
+    - name: clone source code
+      ansible.builtin.git:
         repo: "{{ rmate_repository }}"
         version: "v{{ version_to_install }}"
         clone: true
@@ -38,17 +39,17 @@
         force: true
         dest: /usr/local/src/rmate
 
-    - name: Install rmate script version {{ version_to_install }}
-      copy:
+    - name: install rmate script version {{ version_to_install }}
+      ansible.builtin.copy:
         src: /usr/local/src/rmate/rmate
         dest: /usr/local/bin/rmate
-        remote_src: yes
+        remote_src: true
         owner: root
         group: root
         mode: "0755"
 
-- name: Create aliases for rmate
-  file:
+- name: create aliases for rmate
+  ansible.builtin.file:
     src: /usr/local/bin/rmate
     dest: "/usr/local/bin/{{ item }}"
     state: link
